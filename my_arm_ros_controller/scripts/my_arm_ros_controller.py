@@ -10,8 +10,11 @@ from control_msgs.msg import JointTrajectoryControllerState
 
 # Variables globales
 SIMULATION_TIME = 1
-POSITION_ARM_W = [-1.0,-1.0,-1.0,-1.0,1.0]
+# POSITION_ARM_W = [0.0,-1.572,-1.0,-1.0,1.0]
+POSITION_ARM_W = [0.0,0.0,0.0,0.0,0.0]
+POSITION_ARM_A = [0.0,0.0,-1.572,-1.572,0.0]
 POSITION_ARM_S = [1.0,1.0,0.5,-2.0,-1.0]
+POSITION_ARM_D = [1.572,0.0,0.0,0.0,1.572]
 POSITION_HAND_Q = [0.001, 0.001]
 POSITION_HAND_E = [0.01, -0.01]
 
@@ -20,9 +23,9 @@ POSITION_HAND_E = [0.01, -0.01]
 # Joint2 ---> de -90° a 90° (-1,57rad a 1,57rad)
 # Joint3 ---> de -180° a 57,29° (-3,142rad a 1rad)
 # Joint4 ---> de -180° a 0° (-3,14rad a 0rad)
+# Joint5 ---> de  0° a 180°
 
 # Mano
-# Joint5 ---> de  0° a 180
 # Joint6 ----> de 0.0010m a 0.03m 
 # Joint7 ----> de -0.03m a 0.0010m
 
@@ -86,6 +89,10 @@ def on_press(key):
         set_trayectory_arm(POSITION_ARM_W)
     elif format(key.char) == 's':
         set_trayectory_arm(POSITION_ARM_S)
+    elif format(key.char) == 'a':
+        set_trayectory_arm(POSITION_ARM_A)
+    elif format(key.char) == 'd':
+        set_trayectory_arm(POSITION_ARM_D)
     elif format(key.char) == 'q':
         set_trayectory_hand(POSITION_HAND_Q)
     elif format(key.char) == 'e':
