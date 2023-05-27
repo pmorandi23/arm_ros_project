@@ -87,34 +87,35 @@ def set_trayectory_arm (position):
     pub_arm.publish(cmd_joint_tray)
 
 def on_press(key):
-    # print ("tecla: ",key)
-    if key == Key.esc:
-        rospy.logwarn("Closing arm control...")
-    elif key == Key.enter:
-         rospy.logwarn("Enter...")
-    elif format(key.char) == '1':
-        set_trayectory_arm(POSITION_ARM_1)
-    elif format(key.char) == '2':
-        set_trayectory_arm(POSITION_ARM_2)
-    elif format(key.char) == '3':
-        set_trayectory_arm(POSITION_ARM_3)
-    elif format(key.char) == '4':
-        set_trayectory_arm(POSITION_ARM_4)
-    elif format(key.char) == '5':
-        set_trayectory_arm(POSITION_ARM_5)
-    elif format(key.char) == '6':
-        set_trayectory_arm(POSITION_ARM_6)  
-    elif format(key.char) == '7':
-        set_trayectory_arm(POSITION_ARM_7)        
-    elif format(key.char) == 'q':
-        set_trayectory_hand(POSITION_HAND_CLOSED)
-    elif format(key.char) == 'w':
-        set_trayectory_hand(POSITION_HAND_MID)
-    elif format(key.char) == 'e':
-        set_trayectory_hand(POSITION_HAND_OPEN)
+    if (type(key) == Key):
+        if key == Key.esc:
+            rospy.logwarn("Closing arm control...")
+        else:
+            rospy.logwarn("Please, enter a valid key. For closing, press Esc")
     else:
-        rospy.logwarn("Please, enter a valid key.")
-
+        if format(key.char) == '1':
+            set_trayectory_arm(POSITION_ARM_1)
+        elif format(key.char) == '2':
+            set_trayectory_arm(POSITION_ARM_2)
+        elif format(key.char) == '3':
+            set_trayectory_arm(POSITION_ARM_3)
+        elif format(key.char) == '4':
+            set_trayectory_arm(POSITION_ARM_4)
+        elif format(key.char) == '5':
+            set_trayectory_arm(POSITION_ARM_5)
+        elif format(key.char) == '6':
+            set_trayectory_arm(POSITION_ARM_6)  
+        elif format(key.char) == '7':
+            set_trayectory_arm(POSITION_ARM_7)        
+        elif format(key.char) == 'q':
+            set_trayectory_hand(POSITION_HAND_CLOSED)
+        elif format(key.char) == 'w':
+            set_trayectory_hand(POSITION_HAND_MID)
+        elif format(key.char) == 'e':
+            set_trayectory_hand(POSITION_HAND_OPEN)
+        else:
+            rospy.logwarn("Please, enter a valid key. For closing, press Esc")
+        
 def on_release(key):
     if key == Key.esc:
         # Stop listener
