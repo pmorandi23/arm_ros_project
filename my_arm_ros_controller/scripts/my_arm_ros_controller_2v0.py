@@ -9,8 +9,12 @@ from control_msgs.msg import JointTrajectoryControllerState
 #from geometry_msgs.msg import Twist # esto lo tengo que agregar en el package.xml para que compile
 
 # Variables globales
+start_trayectory = False
 SIMULATION_TIME = 1
 # POSITION_ARM_W = [0.0,-1.572,-1.0,-1.0,1.0]
+# Ejemplo POS_ACTUAL
+# (1.1696644916181498e-05, -7.774496462964464e-05, -9.361588093437234e-05, -3.364574712172441e-05, -1.5563200016277534e-05)
+
 POSITION_ARM_1 = [0.0, 0.0, 0.0, 0.0, 0.0]
 POSITION_ARM_2 = [0.0, 1.57, -0.2905, -2.9436, 0.0]
 POSITION_ARM_3 = [0.0, 1.57, -1.572, -2.9766, 3.142]
@@ -38,16 +42,29 @@ POSITION_HAND_OPEN = [0.029, -0.029]
 # HAND_ACTUAL_POSITION:
 # (-0.00028681349312585083, -0.00035403529289333154)
 # ARM_ACTUAL_POSITION:
-# (1.8640231520095085e-05, -0.000438911951536447, 0.0001305284259149886, 0.000130157593694058, 0.004946943518867819)
 
 
 def state_arm_callback(state: JointTrajectoryControllerState):
-    #print("ARM_ACTUAL_POS_JOINT_1:\n", state.actual.positions[0])
-    #print("ARM_ACTUAL_POS_JOINT_2:\n", state.actual.positions[1])
-    #print("ARM_ACTUAL_POS_JOINT_3:\n", state.actual.positions[2])
-    #print("ARM_ACTUAL_POS_JOINT_4:\n", state.actual.positions[3])
-    #print("ARM_ACTUAL_POS_JOINT_5:\n", state.actual.positions[4])
-    return
+    #print ("ARM_ACTUAL_POS", state.actual.positions)
+    global start_trayectory
+    if (start_trayectory):
+        # POS_1 --> POS_2
+        if state.actual.positions[1] < POSITION_ARM_2[1] and state.actual.positions[2] > POSITION_ARM_2[2] and state.actual.positions[3] > POSITION_ARM_2[3]:
+            set_trayectory_arm(POSITION_ARM_2)
+        # POS_2 --> POS_3
+        elif state.actual.positions[2] > POSITION_ARM_3[2] and state.actual.positions[4] > POSITION_ARM_3[4]:
+            set_trayectory_arm(POSITION_ARM_3)
+        # POS_3 --> POS_4
+        elif state.actual.positions[0] > POSITION_ARM_3[0]:
+            set_trayectory_arm(POSITION_ARM_4)
+        # POS_4 --> POS_5
+        elif state.actual.positions[2] < POSITION_ARM_3[2]:
+            set_trayectory_arm(POSITION_ARM_5)
+        # POS_5 --> POS_6
+        elif state.actual.positions[2] > POSITION_ARM_3[2]:
+            set_trayectory_arm(POSITION_ARM_6)
+        
+        return
     
 
 def state_hand_callback(state: JointTrajectoryControllerState):
@@ -67,7 +84,7 @@ def set_trayectory_hand (position):
     cmd_joint_tray_point.time_from_start.secs = SIMULATION_TIME
     cmd_joint_tray_point.positions = position
     cmd_joint_tray.points.append(cmd_joint_tray_point)
-    rospy.loginfo("Executing trayectory...")
+    #rospy.loginfo("Executing trayectory...")
     pub_hand.publish(cmd_joint_tray)
 
 def set_trayectory_arm (position):
@@ -83,35 +100,48 @@ def set_trayectory_arm (position):
     cmd_joint_tray_point.time_from_start.secs = SIMULATION_TIME
     cmd_joint_tray_point.positions = position
     cmd_joint_tray.points.append(cmd_joint_tray_point)
-    rospy.loginfo("Executing trayectory...")
+    #rospy.loginfo("Executing trayectory...")
     pub_arm.publish(cmd_joint_tray)
 
 def on_press(key):
     if (type(key) == Key):
         if key == Key.esc:
             rospy.logwarn("Closing arm control...")
-        else:
-            rospy.logwarn("Please, enter a valid key. For closing, press Esc")
+        elif key == Key.space:
+            global start_trayectory
+            start_trayectory = True
+            rospy.loginfo("Starting automatic trayectory...")
+
     else:
         if format(key.char) == '1':
+            rospy.loginfo("Starting trayectory 1...")
             set_trayectory_arm(POSITION_ARM_1)
         elif format(key.char) == '2':
+            rospy.loginfo("Starting trayectory 2...")
             set_trayectory_arm(POSITION_ARM_2)
         elif format(key.char) == '3':
+            rospy.loginfo("Starting trayectory 3...")
             set_trayectory_arm(POSITION_ARM_3)
         elif format(key.char) == '4':
+            rospy.loginfo("Starting trayectory 4...")
             set_trayectory_arm(POSITION_ARM_4)
         elif format(key.char) == '5':
+            rospy.loginfo("Starting trayectory 5...")
             set_trayectory_arm(POSITION_ARM_5)
         elif format(key.char) == '6':
+            rospy.loginfo("Starting trayectory 6...")
             set_trayectory_arm(POSITION_ARM_6)  
         elif format(key.char) == '7':
+            rospy.loginfo("Starting trayectory 7...")
             set_trayectory_arm(POSITION_ARM_7)        
         elif format(key.char) == 'q':
+            rospy.loginfo("Starting trayectory q (hand closing)...")
             set_trayectory_hand(POSITION_HAND_CLOSED)
         elif format(key.char) == 'w':
+            rospy.loginfo("Starting trayectory w (hand half open)...")
             set_trayectory_hand(POSITION_HAND_MID)
         elif format(key.char) == 'e':
+            rospy.loginfo("Starting trayectory e (hand opening)...")
             set_trayectory_hand(POSITION_HAND_OPEN)
         else:
             rospy.logwarn("Please, enter a valid key. For closing, press Esc")
@@ -132,7 +162,11 @@ if __name__ == '__main__':
     print("--------- ARM ROS CONTROLLER ------------")
     print("-----Authors: Sebastian Gavegno y Pablo Morandi --------")
     print("-------- Róbotica - UTN FRBA - 2023 -----------")
-    print("Please, use keys number to move the robot...")
+    print("-------------------------------------------------")
+    print("Please, press key Space to start arm robot automatic trayectory")
+    print("-------------------------------------------------")
+    print("Or set manual trayectory with keys: 1, 2, 3, 4, 5, 6 ,7 q, w, e")
+
     # Inicializo comando para controlar brazo
     # init_cmd()
     # Inicializo timer
