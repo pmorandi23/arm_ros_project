@@ -8,13 +8,17 @@ from control_msgs.msg import JointTrajectoryControllerState
 #from turtlesim.srv import SetPen # srv for services 
 #from geometry_msgs.msg import Twist # esto lo tengo que agregar en el package.xml para que compile
 
-# Variables globales
-start_trayectory = False
-SIMULATION_TIME = 1
-# POSITION_ARM_W = [0.0,-1.572,-1.0,-1.0,1.0]
-# Ejemplo POS_ACTUAL
-# (1.1696644916181498e-05, -7.774496462964464e-05, -9.361588093437234e-05, -3.364574712172441e-05, -1.5563200016277534e-05)
+# POSITIONS
+POS_1 = 1
+POS_2 = 2
+POS_3 = 3
+POS_4 = 4
+POS_5 = 5
+POS_6 = 6
+POS_7 = 7
 
+##### GOAL POSITIONS #####
+# ARM
 POSITION_ARM_1 = [0.0, 0.0, 0.0, 0.0, 0.0]
 POSITION_ARM_2 = [0.0, 1.57, -0.2905, -2.9436, 0.0]
 POSITION_ARM_3 = [0.0, 1.57, -1.572, -2.9766, 3.142]
@@ -22,10 +26,29 @@ POSITION_ARM_4 = [3.142, 1.57, -1.572, -2.9766, 3.142]
 POSITION_ARM_5 = [3.142, 1.57, -0.2905, -2.9436, 3.142]
 POSITION_ARM_6 = [3.142, 1.57, -1.572, -2.9436, 3.142]
 POSITION_ARM_7 = [0.0, -0.5233, 0.9368, -0.6504, 0.0]
-
+# HAND
 POSITION_HAND_CLOSED = [0.001, -0.001]
 POSITION_HAND_MID = [0.02, -0.02]
 POSITION_HAND_OPEN = [0.029, -0.029]
+
+##### AUX POSITIONS ####(para consultar si llego al objetivo)
+# ARM
+POSITION_ARM_1_AUX = [0.01, 0.01, 0.01, 0.01, 0.01]
+POSITION_ARM_2_AUX = [0.01, 1.56, -0.28, -2.93, 0.01]
+POSITION_ARM_3_AUX = [0.01, 1.56, -1.56, -2.96, 3.13]
+POSITION_ARM_4_AUX = [3.13, 1.56, -1.56, -2.96, 3.13]
+POSITION_ARM_5_AUX = [3.13, 1.56, -0.30, -2.95, 3.13]
+POSITION_ARM_6_AUX = [3.13, 1.56, -1.56, -2.95, 3.13]
+POSITION_ARM_7_AUX = [0.01, -0.51, 0.92, -0.66, 0.01]
+# HAND
+POSITION_HAND_CLOSED_AUX = [0.001, -0.001]
+POSITION_HAND_MID_AUX = [0.02, -0.02]
+POSITION_HAND_OPEN_AUX = [0.029, -0.029]
+
+# Variables globales
+start_trayectory = False
+actual_pos = 0
+SIMULATION_TIME = 1
 
 # Brazo
 # Joint1 ---> de -180° a 180° (-3,142rad a 3,142rad)
@@ -38,32 +61,95 @@ POSITION_HAND_OPEN = [0.029, -0.029]
 # Joint6 ----> de 0.0010m a 0.03m 
 # Joint7 ----> de -0.03m a 0.0010m
 
-# Ejemplos de state:
-# HAND_ACTUAL_POSITION:
-# (-0.00028681349312585083, -0.00035403529289333154)
-# ARM_ACTUAL_POSITION:
-
-
 def state_arm_callback(state: JointTrajectoryControllerState):
-    #print ("ARM_ACTUAL_POS", state.actual.positions)
+
     global start_trayectory
+    global actual_pos
     if (start_trayectory):
+        list_actual_pos = list(state.actual.positions)
+        #print ("TYPE ARM_ACTUAL_POS:\n", type(state.actual.positions))
+        #print ("LIST ACTUAL POS:\n",list(state.actual.positions))
+        #print ("TYPE ARM_AUX_POS:\n", type(POSITION_ARM_1_AUX))
+        #print ("LIST ARM_AUX_POS:\n",POSITION_ARM_1_AUX)
+        # Si ya estoy en la POS_1
         # POS_1 --> POS_2
-        if state.actual.positions[1] < POSITION_ARM_2[1] and state.actual.positions[2] > POSITION_ARM_2[2] and state.actual.positions[3] > POSITION_ARM_2[3]:
+        if (list_actual_pos[0] < POSITION_ARM_1_AUX[0] and
+            list_actual_pos[1] < POSITION_ARM_1_AUX[1] and
+            list_actual_pos[2] < POSITION_ARM_1_AUX[2] and
+            list_actual_pos[3] < POSITION_ARM_1_AUX[3] and
+            list_actual_pos[4] < POSITION_ARM_1_AUX[4] and 
+            actual_pos != POS_1):
+            actual_pos = POS_1
+            rospy.loginfo("POS_1 reached.")
+            rospy.loginfo("Going to POS_2...")
             set_trayectory_arm(POSITION_ARM_2)
         # POS_2 --> POS_3
-        elif state.actual.positions[2] > POSITION_ARM_3[2] and state.actual.positions[4] > POSITION_ARM_3[4]:
+        elif (list_actual_pos[0] < POSITION_ARM_2_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_2_AUX[1] and
+              list_actual_pos[2] < POSITION_ARM_2_AUX[2] and
+              list_actual_pos[3] < POSITION_ARM_2_AUX[3] and
+              list_actual_pos[4] < POSITION_ARM_2_AUX[4] and 
+            actual_pos == POS_1):
+            actual_pos = POS_2
+            rospy.loginfo("POS_2 reached.")
+            rospy.loginfo("Going to POS_3...")
             set_trayectory_arm(POSITION_ARM_3)
         # POS_3 --> POS_4
-        elif state.actual.positions[0] > POSITION_ARM_3[0]:
+        elif (list_actual_pos[0] < POSITION_ARM_3_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_3_AUX[1] and
+              list_actual_pos[2] < POSITION_ARM_3_AUX[2] and
+              list_actual_pos[3] < POSITION_ARM_3_AUX[3] and
+              list_actual_pos[4] > POSITION_ARM_3_AUX[4] and 
+            actual_pos == POS_2):
+            actual_pos = POS_3
+            rospy.loginfo("POS_3 reached.")
+            rospy.loginfo("Going to POS_4...")
             set_trayectory_arm(POSITION_ARM_4)
         # POS_4 --> POS_5
-        elif state.actual.positions[2] < POSITION_ARM_3[2]:
+        elif (list_actual_pos[0] > POSITION_ARM_4_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_4_AUX[1] and
+              list_actual_pos[2] < POSITION_ARM_4_AUX[2] and
+              list_actual_pos[3] < POSITION_ARM_4_AUX[3] and
+              list_actual_pos[4] > POSITION_ARM_4_AUX[4] and 
+            actual_pos == POS_3):
+            actual_pos = POS_4
+            rospy.loginfo("POS_4 reached.")
+            rospy.loginfo("Going to POS_5...")
             set_trayectory_arm(POSITION_ARM_5)
         # POS_5 --> POS_6
-        elif state.actual.positions[2] > POSITION_ARM_3[2]:
+        elif (list_actual_pos[0] > POSITION_ARM_5_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_5_AUX[1] and
+              list_actual_pos[2] > POSITION_ARM_5_AUX[2] and
+              list_actual_pos[3] > POSITION_ARM_5_AUX[3] and
+              list_actual_pos[4] > POSITION_ARM_5_AUX[4] and 
+            actual_pos == POS_4):
+            actual_pos = POS_5
+            rospy.loginfo("POS_5 reached.")
+            rospy.loginfo("Going to POS_6...")
             set_trayectory_arm(POSITION_ARM_6)
-        
+        # POS_6 --> POS_7
+        elif (list_actual_pos[0] > POSITION_ARM_6_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_6_AUX[1] and
+              list_actual_pos[2] < POSITION_ARM_6_AUX[2] and
+              list_actual_pos[3] > POSITION_ARM_6_AUX[3] and
+              list_actual_pos[4] > POSITION_ARM_6_AUX[4] and 
+            actual_pos == POS_5):
+            actual_pos = POS_6
+            rospy.loginfo("POS_6 reached.")
+            rospy.loginfo("Going to POS_7...")
+            set_trayectory_arm(POSITION_ARM_7)
+        # POS_7
+        elif (list_actual_pos[0] < POSITION_ARM_7_AUX[0] and
+              list_actual_pos[1] < POSITION_ARM_7_AUX[1] and
+              list_actual_pos[2] > POSITION_ARM_7_AUX[2] and
+              list_actual_pos[3] > POSITION_ARM_7_AUX[3] and
+              list_actual_pos[4] < POSITION_ARM_7_AUX[4] and 
+            actual_pos == POS_6):
+            actual_pos = POS_7
+            rospy.loginfo("POS_7 reached.")
+            rospy.loginfo("Auto trajectory complete successfully.")
+            #set_trayectory_arm(POSITION_ARM_7)
+            
         return
     
 
@@ -108,9 +194,12 @@ def on_press(key):
         if key == Key.esc:
             rospy.logwarn("Closing arm control...")
         elif key == Key.space:
+            rospy.loginfo("Starting automatic trayectory...")
+            rospy.loginfo("Going to POS_1...")
+            set_trayectory_arm(POSITION_ARM_1)
             global start_trayectory
             start_trayectory = True
-            rospy.loginfo("Starting automatic trayectory...")
+
 
     else:
         if format(key.char) == '1':
