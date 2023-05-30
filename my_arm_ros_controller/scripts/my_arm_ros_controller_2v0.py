@@ -148,6 +148,7 @@ def state_arm_callback(state: JointTrajectoryControllerState):
             actual_pos = POS_7
             rospy.loginfo("POS_7 reached.")
             rospy.loginfo("Auto trajectory complete successfully.")
+            start_trayectory = False
             #set_trayectory_arm(POSITION_ARM_7)
             
         return
