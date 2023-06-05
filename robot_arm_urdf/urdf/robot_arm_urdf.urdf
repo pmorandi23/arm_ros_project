@@ -12,6 +12,7 @@
     <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
   </joint>
 
+
   <link name="base_link">
     <inertial>
       <origin xyz="4.1633E-17 0 0.073876" rpy="0 0 0" />
@@ -318,6 +319,21 @@
   <gazebo>
     <plugin name="control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
+    </plugin>
+    <plugin name="grasp" filename="libgazebo_grasp_fix.so">
+      <arm>
+        <arm_name>arm</arm_name>
+        <palm_link>link_5</palm_link>
+        <gripper_link>link_6</gripper_link>
+        <gripper_link>link_7</gripper_link>        
+      </arm>
+      <forces_angle_tolerance>100</forces_angle_tolerance>
+      <update_rate>4</update_rate>
+      <grip_count_threshold>4</grip_count_threshold>
+      <max_grip_count>8</max_grip_count>
+      <release_tolerance>0.005</release_tolerance>
+      <diable_collisions_on_attach>false</diable_collisions_on_attach>
+      <contact_topic>__default_topic__</contact_topic>
     </plugin>
   </gazebo>
 
