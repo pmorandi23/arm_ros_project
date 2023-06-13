@@ -28,7 +28,7 @@ POSITION_ARM_6 = [3.142, 1.57, -1.572, -2.9436, 3.142]
 POSITION_ARM_7 = [0.0, -0.5233, 0.9368, -0.6504, 0.0]
 # HAND
 POSITION_HAND_CLOSED = [0.001, -0.001]
-POSITION_HAND_MID = [0.02, -0.02]
+POSITION_HAND_MID = [0.020, -0.020]
 POSITION_HAND_OPEN = [0.029, -0.029]
 
 ##### AUX POSITIONS ####(para consultar si llego al objetivo)
@@ -60,6 +60,8 @@ SIMULATION_TIME = 1
 # Mano
 # Joint6 ----> de 0.0010m a 0.03m 
 # Joint7 ----> de -0.03m a 0.0010m
+
+
 
 def state_arm_callback(state: JointTrajectoryControllerState):
 
@@ -247,7 +249,8 @@ if __name__ == '__main__':
     pub_arm = rospy.Publisher("/robot_arm_controller/command",JointTrajectory, queue_size=10)
     sub_arm = rospy.Subscriber("/robot_arm_controller/state", JointTrajectoryControllerState, callback=state_arm_callback)
     sub_hand = rospy.Subscriber("/hand_ee_controller/state", JointTrajectoryControllerState, callback=state_hand_callback)
-
+    #gazebo_contact = rospy.Subscriber("/contacts",ContactsState, callback=collision_callback)
+    
     rospy.loginfo("/arm_ros_controller node has been started. ")
     print("--------- ARM ROS CONTROLLER ------------")
     print("-----Authors: Sebastian Gavegno y Pablo Morandi --------")
