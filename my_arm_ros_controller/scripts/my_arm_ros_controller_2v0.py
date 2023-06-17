@@ -20,10 +20,12 @@ POS_7 = 7
 ##### GOAL POSITIONS #####
 # ARM
 POSITION_ARM_1 = [0.0, 0.0, 0.0, 0.0, 0.0]
+POSITION_ARM_1_5 = [0.0, 1.0, 0.2, -2.8, 0.0]
 POSITION_ARM_2 = [0.0, 1.57, -0.2905, -2.8, 0.0]
 POSITION_ARM_3 = [0.0, 1.57, -1.572, -2.9766, 0.0]
 POSITION_ARM_4 = [3.142, 1.57, -1.572, -2.9766, 0.0]
 POSITION_ARM_5 = [3.142, 1.57, -0.2905, -2.8, 0.0]
+POSITION_ARM_5_5 = [3.142, 1.0, 0.2, -2.8, 0.0]
 POSITION_ARM_6 = [3.142, 1.57, -1.572, -2.9436, 0.0]
 POSITION_ARM_7 = [0.0, -0.5233, 0.9368, -0.6504, 0.0]
 # HAND
@@ -208,6 +210,12 @@ def on_press(key):
         if format(key.char) == '1':
             rospy.loginfo("Starting trayectory 1...")
             set_trayectory_arm(POSITION_ARM_1)
+        elif format(key.char) == 'a':
+            rospy.loginfo("Starting trayectory 2,5...")
+            set_trayectory_arm(POSITION_ARM_1_5)
+        elif format(key.char) == 'b':
+            rospy.loginfo("Starting trayectory 5,5...")
+            set_trayectory_arm(POSITION_ARM_5_5)
         elif format(key.char) == '2':
             rospy.loginfo("Starting trayectory 2...")
             set_trayectory_arm(POSITION_ARM_2)
