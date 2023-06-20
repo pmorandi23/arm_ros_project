@@ -16,18 +16,20 @@ POS_4 = 4
 POS_5 = 5
 POS_6 = 6
 POS_7 = 7
+POS_8 = 8
+POS_9 = 9
 
 ##### GOAL POSITIONS #####
 # ARM
 POSITION_ARM_1 = [0.0, 0.0, 0.0, 0.0, 0.0]
-POSITION_ARM_1_5 = [0.0, 1.0, 0.2, -2.8, 0.0]
-POSITION_ARM_2 = [0.0, 1.57, -0.2905, -2.8, 0.0]
-POSITION_ARM_3 = [0.0, 1.57, -1.572, -2.9766, 0.0]
-POSITION_ARM_4 = [3.142, 1.57, -1.572, -2.9766, 0.0]
-POSITION_ARM_5 = [3.142, 1.57, -0.2905, -2.8, 0.0]
-POSITION_ARM_5_5 = [3.142, 1.0, 0.2, -2.8, 0.0]
-POSITION_ARM_6 = [3.142, 1.57, -1.572, -2.9436, 0.0]
-POSITION_ARM_7 = [0.0, -0.5233, 0.9368, -0.6504, 0.0]
+POSITION_ARM_2 = [0.0, 1.0, 0.2, -2.8, 0.0]
+POSITION_ARM_3 = [0.0, 1.57, -0.2905, -2.8, 0.0]
+POSITION_ARM_4 = [0.0, 1.57, -1.572, -2.9766, 0.0]
+POSITION_ARM_5 = [3.142, 1.57, -1.572, -2.9766, 0.0]
+POSITION_ARM_6 = [3.142, 1.57, -0.2905, -2.8, 0.0]
+POSITION_ARM_7 = [3.142, 1.0, 0.2, -2.8, 0.0]
+POSITION_ARM_8 = [3.142, 1.57, -1.572, -2.9436, 0.0]
+POSITION_ARM_9 = [0.0, -0.5233, 0.9368, -0.6504, 0.0]
 # HAND
 POSITION_HAND_CLOSED = [0.001, -0.001]
 POSITION_HAND_MID = [0.020, -0.020]
@@ -36,12 +38,14 @@ POSITION_HAND_OPEN = [0.029, -0.029]
 ##### AUX POSITIONS ####(para consultar si llego al objetivo)
 # ARM
 POSITION_ARM_1_AUX = [0.01, 0.01, 0.01, 0.01, 0.01]
-POSITION_ARM_2_AUX = [0.01, 1.56, -0.28, -2.79, 0.01]
-POSITION_ARM_3_AUX = [0.01, 1.56, -1.56, -2.96, 0.00]
-POSITION_ARM_4_AUX = [3.13, 1.56, -1.56, -2.96, 0.00]
-POSITION_ARM_5_AUX = [3.13, 1.56, -0.30, -2.95, 0.00]
-POSITION_ARM_6_AUX = [3.13, 1.56, -1.56, -2.95, 0.00]
-POSITION_ARM_7_AUX = [0.01, -0.51, 0.92, -0.66, 0.01]
+POSITION_ARM_2_AUX = [0.01, 0.99, 0.19, -2.79, 0.01]
+POSITION_ARM_3_AUX = [0.01, 1.56, -0.28, -2.79, 0.01]
+POSITION_ARM_4_AUX = [0.01, 1.56, -1.56, -2.96, 0.01]
+POSITION_ARM_5_AUX = [3.13, 1.56, -1.56, -2.96, 0.01]
+POSITION_ARM_6_AUX = [3.13, 1.56, -0.30, -2.95, 0.01]
+POSITION_ARM_7_AUX = [3.13, 0.99, 0.19, -2.79, 0.01]
+POSITION_ARM_8_AUX = [3.13, 1.56, -1.56, -2.95, 0.01]
+POSITION_ARM_9_AUX = [0.01, -0.51, 0.92, -0.66, 0.01]
 # HAND
 POSITION_HAND_CLOSED_AUX = [0.001, -0.001]
 POSITION_HAND_MID_AUX = [0.02, -0.02]
@@ -90,7 +94,7 @@ def state_arm_callback(state: JointTrajectoryControllerState):
         # POS_2 --> POS_3
         elif (list_actual_pos[0] < POSITION_ARM_2_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_2_AUX[1] and
-              list_actual_pos[2] < POSITION_ARM_2_AUX[2] and
+              list_actual_pos[2] > POSITION_ARM_2_AUX[2] and
               list_actual_pos[3] < POSITION_ARM_2_AUX[3] and
               list_actual_pos[4] < POSITION_ARM_2_AUX[4] and 
             actual_pos == POS_1):
@@ -103,18 +107,18 @@ def state_arm_callback(state: JointTrajectoryControllerState):
               list_actual_pos[1] > POSITION_ARM_3_AUX[1] and
               list_actual_pos[2] < POSITION_ARM_3_AUX[2] and
               list_actual_pos[3] < POSITION_ARM_3_AUX[3] and
-              list_actual_pos[4] > POSITION_ARM_3_AUX[4] and 
+              list_actual_pos[4] < POSITION_ARM_3_AUX[4] and 
             actual_pos == POS_2):
             actual_pos = POS_3
             rospy.loginfo("POS_3 reached.")
             rospy.loginfo("Going to POS_4...")
             set_trayectory_arm(POSITION_ARM_4)
         # POS_4 --> POS_5
-        elif (list_actual_pos[0] > POSITION_ARM_4_AUX[0] and
+        elif (list_actual_pos[0] < POSITION_ARM_4_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_4_AUX[1] and
               list_actual_pos[2] < POSITION_ARM_4_AUX[2] and
               list_actual_pos[3] < POSITION_ARM_4_AUX[3] and
-              list_actual_pos[4] > POSITION_ARM_4_AUX[4] and 
+              list_actual_pos[4] < POSITION_ARM_4_AUX[4] and 
             actual_pos == POS_3):
             actual_pos = POS_4
             rospy.loginfo("POS_4 reached.")
@@ -123,9 +127,9 @@ def state_arm_callback(state: JointTrajectoryControllerState):
         # POS_5 --> POS_6
         elif (list_actual_pos[0] > POSITION_ARM_5_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_5_AUX[1] and
-              list_actual_pos[2] > POSITION_ARM_5_AUX[2] and
-              list_actual_pos[3] > POSITION_ARM_5_AUX[3] and
-              list_actual_pos[4] > POSITION_ARM_5_AUX[4] and 
+              list_actual_pos[2] < POSITION_ARM_5_AUX[2] and
+              list_actual_pos[3] < POSITION_ARM_5_AUX[3] and
+              list_actual_pos[4] < POSITION_ARM_5_AUX[4] and 
             actual_pos == POS_4):
             actual_pos = POS_5
             rospy.loginfo("POS_5 reached.")
@@ -134,23 +138,45 @@ def state_arm_callback(state: JointTrajectoryControllerState):
         # POS_6 --> POS_7
         elif (list_actual_pos[0] > POSITION_ARM_6_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_6_AUX[1] and
-              list_actual_pos[2] < POSITION_ARM_6_AUX[2] and
+              list_actual_pos[2] > POSITION_ARM_6_AUX[2] and
               list_actual_pos[3] > POSITION_ARM_6_AUX[3] and
-              list_actual_pos[4] > POSITION_ARM_6_AUX[4] and 
+              list_actual_pos[4] < POSITION_ARM_6_AUX[4] and 
             actual_pos == POS_5):
             actual_pos = POS_6
             rospy.loginfo("POS_6 reached.")
             rospy.loginfo("Going to POS_7...")
             set_trayectory_arm(POSITION_ARM_7)
-        # POS_7
-        elif (list_actual_pos[0] < POSITION_ARM_7_AUX[0] and
-              list_actual_pos[1] < POSITION_ARM_7_AUX[1] and
+        # POS_7 --> POS_8
+        elif (list_actual_pos[0] > POSITION_ARM_7_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_7_AUX[1] and
               list_actual_pos[2] > POSITION_ARM_7_AUX[2] and
-              list_actual_pos[3] > POSITION_ARM_7_AUX[3] and
+              list_actual_pos[3] < POSITION_ARM_7_AUX[3] and
               list_actual_pos[4] < POSITION_ARM_7_AUX[4] and 
             actual_pos == POS_6):
             actual_pos = POS_7
             rospy.loginfo("POS_7 reached.")
+            rospy.loginfo("Going to POS_8...")
+            set_trayectory_arm(POSITION_ARM_8)
+        # POS_8 --> POS_9
+        elif (list_actual_pos[0] > POSITION_ARM_8_AUX[0] and
+              list_actual_pos[1] > POSITION_ARM_8_AUX[1] and
+              list_actual_pos[2] < POSITION_ARM_8_AUX[2] and
+              list_actual_pos[3] > POSITION_ARM_8_AUX[3] and
+              list_actual_pos[4] < POSITION_ARM_8_AUX[4] and 
+            actual_pos == POS_7):
+            actual_pos = POS_8
+            rospy.loginfo("POS_8 reached.")
+            rospy.loginfo("Going to POS_9...")
+            set_trayectory_arm(POSITION_ARM_9)
+        # POS_9
+        elif (list_actual_pos[0] < POSITION_ARM_9_AUX[0] and
+              list_actual_pos[1] < POSITION_ARM_9_AUX[1] and
+              list_actual_pos[2] > POSITION_ARM_9_AUX[2] and
+              list_actual_pos[3] > POSITION_ARM_9_AUX[3] and
+              list_actual_pos[4] < POSITION_ARM_9_AUX[4] and 
+            actual_pos == POS_8):
+            actual_pos = POS_9
+            rospy.loginfo("POS_9 reached.")
             rospy.loginfo("Auto trajectory complete successfully.")
             start_trayectory = False
             #set_trayectory_arm(POSITION_ARM_7)
@@ -210,12 +236,6 @@ def on_press(key):
         if format(key.char) == '1':
             rospy.loginfo("Starting trayectory 1...")
             set_trayectory_arm(POSITION_ARM_1)
-        elif format(key.char) == 'a':
-            rospy.loginfo("Starting trayectory 2,5...")
-            set_trayectory_arm(POSITION_ARM_1_5)
-        elif format(key.char) == 'b':
-            rospy.loginfo("Starting trayectory 5,5...")
-            set_trayectory_arm(POSITION_ARM_5_5)
         elif format(key.char) == '2':
             rospy.loginfo("Starting trayectory 2...")
             set_trayectory_arm(POSITION_ARM_2)
@@ -234,6 +254,12 @@ def on_press(key):
         elif format(key.char) == '7':
             rospy.loginfo("Starting trayectory 7...")
             set_trayectory_arm(POSITION_ARM_7)        
+        elif format(key.char) == '8':
+            rospy.loginfo("Starting trayectory 8...")
+            set_trayectory_arm(POSITION_ARM_8)
+        elif format(key.char) == '9':
+            rospy.loginfo("Starting trayectory 9...")
+            set_trayectory_arm(POSITION_ARM_9)
         elif format(key.char) == 'q':
             rospy.loginfo("Starting trayectory q (hand closing)...")
             set_trayectory_hand(POSITION_HAND_CLOSED)
