@@ -236,39 +236,51 @@ def on_press(key):
         if format(key.char) == '1':
             rospy.loginfo("Starting trayectory 1...")
             set_trayectory_arm(POSITION_ARM_1)
+            rospy.loginfo("POS_1 reached.")
         elif format(key.char) == '2':
             rospy.loginfo("Starting trayectory 2...")
             set_trayectory_arm(POSITION_ARM_2)
+            rospy.loginfo("POS_2 reached.")
         elif format(key.char) == '3':
             rospy.loginfo("Starting trayectory 3...")
             set_trayectory_arm(POSITION_ARM_3)
+            rospy.loginfo("POS_3 reached.")
         elif format(key.char) == '4':
             rospy.loginfo("Starting trayectory 4...")
             set_trayectory_arm(POSITION_ARM_4)
+            rospy.loginfo("POS_4 reached.")
         elif format(key.char) == '5':
             rospy.loginfo("Starting trayectory 5...")
             set_trayectory_arm(POSITION_ARM_5)
+            rospy.loginfo("POS_5 reached.")
         elif format(key.char) == '6':
             rospy.loginfo("Starting trayectory 6...")
-            set_trayectory_arm(POSITION_ARM_6)  
+            set_trayectory_arm(POSITION_ARM_6)
+            rospy.loginfo("POS_6 reached.")  
         elif format(key.char) == '7':
             rospy.loginfo("Starting trayectory 7...")
-            set_trayectory_arm(POSITION_ARM_7)        
+            set_trayectory_arm(POSITION_ARM_7)
+            rospy.loginfo("POS_7 reached.")        
         elif format(key.char) == '8':
             rospy.loginfo("Starting trayectory 8...")
             set_trayectory_arm(POSITION_ARM_8)
+            rospy.loginfo("POS_8 reached.")
         elif format(key.char) == '9':
             rospy.loginfo("Starting trayectory 9...")
             set_trayectory_arm(POSITION_ARM_9)
+            rospy.loginfo("POS_9 reached.")
         elif format(key.char) == 'q':
             rospy.loginfo("Starting trayectory q (hand closing)...")
             set_trayectory_hand(POSITION_HAND_CLOSED)
+            rospy.loginfo("POSITION_HAND_CLOSED reached.")
         elif format(key.char) == 'w':
             rospy.loginfo("Starting trayectory w (hand half open)...")
             set_trayectory_hand(POSITION_HAND_MID)
+            rospy.loginfo("POSITION_HAND_MID reached.")
         elif format(key.char) == 'e':
             rospy.loginfo("Starting trayectory e (hand opening)...")
             set_trayectory_hand(POSITION_HAND_OPEN)
+            rospy.loginfo("POSITION_HAND_OPEN reached.")
         else:
             rospy.logwarn("Please, enter a valid key. For closing, press Esc")
         
