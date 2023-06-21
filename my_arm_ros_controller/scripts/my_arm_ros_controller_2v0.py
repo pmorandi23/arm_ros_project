@@ -47,13 +47,16 @@ POSITION_ARM_7_AUX = [3.13, 0.99, 0.19, -2.79, 0.01]
 POSITION_ARM_8_AUX = [3.13, 1.56, -1.56, -2.95, 0.01]
 POSITION_ARM_9_AUX = [0.01, -0.51, 0.92, -0.66, 0.01]
 # HAND
-POSITION_HAND_CLOSED_AUX = [0.001, -0.001]
-POSITION_HAND_MID_AUX = [0.02, -0.02]
-POSITION_HAND_OPEN_AUX = [0.029, -0.029]
+POSITION_HAND_CLOSED_AUX = [0.002, -0.002]
+POSITION_HAND_MID_AUX = [0.021, -0.021]
+POSITION_HAND_OPEN_AUX = [0.028, -0.028]
 
 # Variables globales
 start_trayectory = False
+start_hand_trayectory = False
 actual_pos = 0
+actual_hand_pos = 0
+object_grabbed = False
 SIMULATION_TIME = 1
 
 # Brazo
@@ -72,7 +75,11 @@ SIMULATION_TIME = 1
 def state_arm_callback(state: JointTrajectoryControllerState):
 
     global start_trayectory
+    global start_hand_trayectory
+    global object_grabbed
     global actual_pos
+    global actual_hand_pos
+    
     if (start_trayectory):
         list_actual_pos = list(state.actual.positions)
         #print ("TYPE ARM_ACTUAL_POS:\n", type(state.actual.positions))
@@ -108,11 +115,19 @@ def state_arm_callback(state: JointTrajectoryControllerState):
               list_actual_pos[2] < POSITION_ARM_3_AUX[2] and
               list_actual_pos[3] < POSITION_ARM_3_AUX[3] and
               list_actual_pos[4] < POSITION_ARM_3_AUX[4] and 
-            actual_pos == POS_2):
-            actual_pos = POS_3
-            rospy.loginfo("POS_3 reached.")
-            rospy.loginfo("Going to POS_4...")
-            set_trayectory_arm(POSITION_ARM_4)
+              actual_pos == POS_2):
+             
+            if(object_grabbed == False):
+                # Habilito maquina de la mano y deshabilito maquina del brazo
+                rospy.loginfo("POS_3 reached.")
+                start_hand_trayectory = True
+                start_trayectory = False
+                rospy.loginfo("Opening hand to grab object...")
+                set_trayectory_hand(POSITION_HAND_OPEN)
+            else:
+                actual_pos = POS_3
+                rospy.loginfo("Going to POS_4...")
+                set_trayectory_arm(POSITION_ARM_4)        
         # POS_4 --> POS_5
         elif (list_actual_pos[0] < POSITION_ARM_4_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_4_AUX[1] and
@@ -142,10 +157,19 @@ def state_arm_callback(state: JointTrajectoryControllerState):
               list_actual_pos[3] > POSITION_ARM_6_AUX[3] and
               list_actual_pos[4] < POSITION_ARM_6_AUX[4] and 
             actual_pos == POS_5):
-            actual_pos = POS_6
-            rospy.loginfo("POS_6 reached.")
-            rospy.loginfo("Going to POS_7...")
-            set_trayectory_arm(POSITION_ARM_7)
+            
+            if(object_grabbed == True):
+                # Habilito maquina de la mano y deshabilito maquina del brazo
+                rospy.loginfo("POS_6 reached.")
+                start_hand_trayectory = True
+                start_trayectory = False
+                rospy.loginfo("Opening hand to leave object...")
+                set_trayectory_hand(POSITION_HAND_OPEN)
+            else:
+                actual_pos = POS_6
+                rospy.loginfo("Going to POS_7...")
+                set_trayectory_arm(POSITION_ARM_7) 
+               
         # POS_7 --> POS_8
         elif (list_actual_pos[0] > POSITION_ARM_7_AUX[0] and
               list_actual_pos[1] > POSITION_ARM_7_AUX[1] and
@@ -179,15 +203,48 @@ def state_arm_callback(state: JointTrajectoryControllerState):
             rospy.loginfo("POS_9 reached.")
             rospy.loginfo("Auto trajectory complete successfully.")
             start_trayectory = False
+            actual_hand_pos = 0
             #set_trayectory_arm(POSITION_ARM_7)
             
         return
     
 
 def state_hand_callback(state: JointTrajectoryControllerState):
-    #print("HAND_ACTUAL_POS_JOINT_6:\n", state.actual.positions[0])
-    #print("HAND_ACTUAL_POS_JOINT_7:\n", state.actual.positions[1])
-    return 
+    
+    global start_hand_trayectory
+    global actual_hand_pos
+    global actual_pos
+    global object_grabbed
+    global start_trayectory
+    
+    if start_hand_trayectory:
+        list_hand_actual_pos = list(state.actual.positions)
+        if (list_hand_actual_pos[0] > POSITION_HAND_OPEN_AUX[0] and
+            list_hand_actual_pos[1] < POSITION_HAND_OPEN_AUX[1] and
+            actual_hand_pos != POS_1):
+            actual_hand_pos = POS_1
+            object_grabbed = False
+            if(actual_pos == POS_5):
+                rospy.logwarn("Hand opened. Object leaved in target.")
+                # Reanudo maquina de estados del brazo
+                start_trayectory = True
+                start_hand_trayectory = False
+            else:
+                rospy.loginfo("Hand opened. Closing to grab object..")
+                set_trayectory_hand(POSITION_HAND_MID)
+        
+        elif (list_hand_actual_pos[0] < POSITION_HAND_MID_AUX[0] and
+            list_hand_actual_pos[1] > POSITION_HAND_MID_AUX[1] and
+            actual_hand_pos != POS_2):
+            actual_hand_pos = POS_2 
+            rospy.logwarn("Object grabbed.")
+            rospy.sleep(0.5)
+            object_grabbed = True
+            # Reanudo maquina de estados del brazo
+            start_trayectory = True
+            start_hand_trayectory = False
+            
+        return 
 
     
 def set_trayectory_hand (position):
@@ -228,6 +285,7 @@ def on_press(key):
             rospy.loginfo("Starting automatic trayectory...")
             rospy.loginfo("Going to POS_1...")
             set_trayectory_arm(POSITION_ARM_1)
+            set_trayectory_hand(POSITION_HAND_OPEN)
             global start_trayectory
             start_trayectory = True
 
